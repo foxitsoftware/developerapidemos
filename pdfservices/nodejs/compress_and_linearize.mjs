@@ -49,6 +49,29 @@ async function compressPDF(doc, id, secret, level="MEDIUM") {
 
 }
 
+async function linearizePDF(doc, id, secret, level="MEDIUM") {
+
+	let headers = {
+		"client_id":id,
+		"client_secret":secret,
+		"Content-Type":"application/json"
+	};
+
+	let body = {
+		"documentId":doc,
+		"compressionLevel":level 	
+	};
+
+	let resp = await fetch(`${HOST}/pdf-services/api/documents/optimize/pdf-linearize`, {
+		method:"POST",
+		headers, 
+		body:JSON.stringify(body)
+	});
+
+	return await resp.json();
+
+}
+
 async function checkTask(task, id, secret) {
 
 	while(true) {
@@ -100,14 +123,26 @@ async function downloadResult(doc, filePath, id, secret) {
 
 }
 
-let doc = await uploadDoc('../../inputfiles/input.pdf', CLIENT_ID, CLIENT_SECRET);
+let input = "../../inputfiles/input.pdf";
+console.log(`File size of input: ${fs.statSync(input).size}`)
+
+let doc = await uploadDoc(input, CLIENT_ID, CLIENT_SECRET);
 console.log(`Uploaded doc to Foxit, id is ${doc['documentId']}`);
 
 let task = await compressPDF(doc.documentId, CLIENT_ID, CLIENT_SECRET, "HIGH");
 console.log(`Created task, id is ${task['taskId']}`);
 
 let result = await checkTask(task.taskId, CLIENT_ID, CLIENT_SECRET);
-console.log(`Final result: ${JSON.stringify(result)}`);
+console.log("Done converting to PDF. Now doing linearize.")
 
-await downloadResult(result.resultDocumentId, "../../output/node_input_compressed.pdf", CLIENT_ID, CLIENT_SECRET);
-console.log("Done and saved to: ../../output/node_input_compressed.pdf");
+task = await linearizePDF(result.resultDocumentId, CLIENT_ID, CLIENT_SECRET, "HIGH");
+console.log(`Created task, id is ${task['taskId']}`);
+
+result = await checkTask(task.taskId, CLIENT_ID, CLIENT_SECRET);
+console.log("Done with linearize task.");
+
+
+let output = "../../output/node_really_optimized.pdf";
+downloadResult(result["resultDocumentId"], output , CLIENT_ID, CLIENT_SECRET);
+console.log(`Done and saved to: ${output}.`)
+console.log(`File size of output: ${fs.statSync(output).size}`)
