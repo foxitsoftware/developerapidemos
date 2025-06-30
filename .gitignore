@@ -1,0 +1,5 @@
+.env
+temp
+output/*
+!output/.gitkeep
+.vscode
