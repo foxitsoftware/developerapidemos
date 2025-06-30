@@ -21,7 +21,7 @@ def uploadDoc(path, id, secret):
 		return request.json()
 
 
-def manipulatePDF(doc, actions, id, secret):
+def manipulatePDF(doc, operations, id, secret):
 	
 	headers = {
 		"client_id":id,
