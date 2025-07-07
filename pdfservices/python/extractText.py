@@ -66,41 +66,24 @@ def checkTask(task, id, secret):
 			sleep(5)
 
 
-def downloadResult(doc, path, id, secret):
+def getResult(doc, id, secret):
 	
 	headers = {
 		"client_id":id,
 		"client_secret":secret
 	}
 
-	with open(path, "wb") as output:
-		
-		bits = requests.get(f"{HOST}/pdf-services/api/documents/{doc}/download", stream=True, headers=headers).content 
-		output.write(bits)
+	return requests.get(f"{HOST}/pdf-services/api/documents/{doc}/download", headers=headers).content 
 
 doc = uploadDoc("../../inputfiles/input.pdf", CLIENT_ID, CLIENT_SECRET)
 print(f"Uploaded pdf to Foxit, id is {doc['documentId']}")
 
 task = extractPDF(doc["documentId"], "TEXT", CLIENT_ID, CLIENT_SECRET)
 print(f"Created task, id is {task['taskId']}")
+
 result = checkTask(task["taskId"], CLIENT_ID, CLIENT_SECRET)
 print(f"Final result: {result}")
 
-downloadResult(result["resultDocumentId"], "../../output/extract_text.txt", CLIENT_ID, CLIENT_SECRET)
-print("Done and saved to: ../../output/extract_text.txt")
+text = getResult(result["resultDocumentId"], CLIENT_ID, CLIENT_SECRET)
+print(text)
 
-task = extractPDF(doc["documentId"], "IMAGE", CLIENT_ID, CLIENT_SECRET)
-print(f"Created task, id is {task['taskId']}")
-result = checkTask(task["taskId"], CLIENT_ID, CLIENT_SECRET)
-print(f"Final result: {result}")
-
-downloadResult(result["resultDocumentId"], "../../output/extract_images.zip", CLIENT_ID, CLIENT_SECRET)
-print("Done and saved to: ../../output/extract_images.zip")
-
-task = extractPDF(doc["documentId"], "PAGE", CLIENT_ID, CLIENT_SECRET, 2)
-print(f"Created task, id is {task['taskId']}")
-result = checkTask(task["taskId"], CLIENT_ID, CLIENT_SECRET)
-print(f"Final result: {result}")
-
-downloadResult(result["resultDocumentId"], "../../output/extract_page.pdf", CLIENT_ID, CLIENT_SECRET)
-print("Done and saved to: ../../output/extract_page.pdf")
