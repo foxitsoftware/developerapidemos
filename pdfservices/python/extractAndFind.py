@@ -75,15 +75,25 @@ def getResult(doc, id, secret):
 
 	return requests.get(f"{HOST}/pdf-services/api/documents/{doc}/download", headers=headers).text
 
-doc = uploadDoc("../../inputfiles/input.pdf", CLIENT_ID, CLIENT_SECRET)
-print(f"Uploaded pdf to Foxit, id is {doc['documentId']}")
+# Get PDFs from our input directory
+inputFiles = list(filter(lambda x: x.endswith('.pdf'), os.listdir('../../inputfiles')))
 
-task = extractPDF(doc["documentId"], "TEXT", CLIENT_ID, CLIENT_SECRET)
-print(f"Created task, id is {task['taskId']}")
+# Keyword to match on: 
+keyword = "Shakespeare"
 
-result = checkTask(task["taskId"], CLIENT_ID, CLIENT_SECRET)
-print(f"Final result: {result}")
+for file in inputFiles:
+	
+	doc = uploadDoc(f"../../inputfiles/{file}", CLIENT_ID, CLIENT_SECRET)
+	print(f"Uploaded pdf, {file}, to Foxit, id is {doc['documentId']}")
 
-text = getResult(result["resultDocumentId"], CLIENT_ID, CLIENT_SECRET)
-print(text)
+	task = extractPDF(doc["documentId"], "TEXT", CLIENT_ID, CLIENT_SECRET)
+	result = checkTask(task["taskId"], CLIENT_ID, CLIENT_SECRET)
+
+	text = getResult(result["resultDocumentId"], CLIENT_ID, CLIENT_SECRET)
+	if keyword in text:
+		print(f"\033[32mThe pdf, {file}, matched on our keyword: {keyword}\033[0m")
+	else:
+		print(f"The pdf, {file}, did not match on our keyword: {keyword}")
+	
+	print("")
 
