@@ -83,6 +83,5 @@ print(f"Created task, id is {task['taskId']}")
 result = checkTask(task["taskId"], CLIENT_ID, CLIENT_SECRET)
 print(f"Final result: {result}")
 
-# Waiting for bug fix 
-#downloadResult(result["resultDocumentId"], "../../output/split.pdf", CLIENT_ID, CLIENT_SECRET)
-#print("Done and saved to: ../../output/input_linearized.pdf")
+downloadResult(result["resultDocumentId"], "../../output/split.zip", CLIENT_ID, CLIENT_SECRET)
+print("Done and saved to: ../../output/split.zip")
