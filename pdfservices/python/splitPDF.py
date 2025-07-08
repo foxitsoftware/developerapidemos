@@ -15,7 +15,8 @@ def uploadDoc(path, id, secret):
 	}
 
 	with open(path, 'rb') as f:
-		files = {'file': (path, f)}
+		filename = os.path.basename(path)
+		files = {'file': f}
 
 		request = requests.post(f"{HOST}/pdf-services/api/documents/upload", files=files, headers=headers)
 		return request.json()
