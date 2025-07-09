@@ -1,3 +1,6 @@
+# Requires pip install html-to-markdown, https://pypi.org/project/html-to-markdown/
+from html_to_markdown import convert_to_markdown
+
 import os
 import requests
 import sys 
@@ -20,7 +23,8 @@ def uploadDoc(path, id, secret):
 		request = requests.post(f"{HOST}/pdf-services/api/documents/upload", files=files, headers=headers)
 		return request.json()
 
-def compressPDF(doc, level, id, secret):
+
+def pdfToHTML(doc, id, secret):
 	
 	headers = {
 		"client_id":id,
@@ -29,26 +33,10 @@ def compressPDF(doc, level, id, secret):
 	}
 
 	body = {
-		"documentId":doc,
-		"compressionLevel":level	
+		"documentId":doc	
 	}
 
-	request = requests.post(f"{HOST}/pdf-services/api/documents/modify/pdf-compress", json=body, headers=headers)
-	return request.json()
-
-def linearizePDF(doc, id, secret):
-
-	headers = {
-		"client_id":id,
-		"client_secret":secret,
-		"Content-Type":"application/json"
-	}
-
-	body = {
-		"documentId":doc
-	}
-
-	request = requests.post(f"{HOST}/pdf-services/api/documents/optimize/pdf-linearize", json=body, headers=headers)
+	request = requests.post(f"{HOST}/pdf-services/api/documents/convert/pdf-to-html", json=body, headers=headers)
 	return request.json()
 
 def checkTask(task, id, secret):
@@ -76,36 +64,31 @@ def checkTask(task, id, secret):
 			print(f"Current status, {status['status']}, percentage: {status['progress']}")
 			sleep(5)
 
-def downloadResult(doc, path, id, secret):
+
+def getResult(doc, id, secret):
 	
 	headers = {
 		"client_id":id,
 		"client_secret":secret
 	}
 
-	with open(path, "wb") as output:
-		
-		bits = requests.get(f"{HOST}/pdf-services/api/documents/{doc}/download", stream=True, headers=headers).content 
-		output.write(bits)
+	return requests.get(f"{HOST}/pdf-services/api/documents/{doc}/download", headers=headers).text
 
-input = "../../inputfiles/input.pdf"
-print(f"File size of input: {os.path.getsize(input)}")
-doc = uploadDoc(input, CLIENT_ID, CLIENT_SECRET)
+doc = uploadDoc("../../inputfiles/a-midsummer-nights-dream.pdf", CLIENT_ID, CLIENT_SECRET)
 print(f"Uploaded doc to Foxit, id is {doc['documentId']}")
 
-task = compressPDF(doc["documentId"], "HIGH", CLIENT_ID, CLIENT_SECRET)
+task = pdfToHTML(doc["documentId"], CLIENT_ID, CLIENT_SECRET)
 print(f"Created task, id is {task['taskId']}")
-
 result = checkTask(task["taskId"], CLIENT_ID, CLIENT_SECRET)
-print("Done converting to PDF. Now doing linearize.")
+html = getResult(result["resultDocumentId"], CLIENT_ID, CLIENT_SECRET)
+print("Done, converting HTML now...")
+md = convert_to_markdown(html)
 
-task = linearizePDF(result["resultDocumentId"], CLIENT_ID, CLIENT_SECRET)
-print(f"Created task, id is {task['taskId']}")
+with open("../../output/output.md", "w") as f:
+	f.write(md)
 
-result = checkTask(task["taskId"], CLIENT_ID, CLIENT_SECRET)
-print("Done with linearize task.")
+print("Done and saved to: ../../output/output.md")
 
-output = "../../output/really_optimized.pdf"
-downloadResult(result["resultDocumentId"], output , CLIENT_ID, CLIENT_SECRET)
-print(f"Done and saved to: {output}.")
-print(f"File size of output: {os.path.getsize(output)}") 
+
+#downloadResult(result["resultDocumentId"], "../../output/output.html", CLIENT_ID, CLIENT_SECRET)
+#print("Done and saved to: ../../output/output.html")
