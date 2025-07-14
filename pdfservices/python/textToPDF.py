@@ -30,8 +30,7 @@ def textToPDF(doc, id, secret):
 	}
 
 	body = {
-		"documentId":doc,
-		"stuff":True	
+		"documentId":doc
 	}
 
 	request = requests.post(f"{HOST}/pdf-services/api/documents/create/pdf-from-text", json=body, headers=headers)

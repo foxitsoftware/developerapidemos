@@ -151,7 +151,7 @@ class PDFServiceSDK:
 
     def text_to_pdf(self, input_path, output_path):
         doc_id = self._upload_doc(input_path)
-        body = {"documentId": doc_id, "stuff": True}
+        body = {"documentId": doc_id}
         r = requests.post(f"{self.host}/pdf-services/api/documents/create/pdf-from-text", json=body, headers=self._headers("application/json"))
         r.raise_for_status()
         task_id = r.json()["taskId"]

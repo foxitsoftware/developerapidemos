@@ -97,7 +97,7 @@ print(f"Final result: {result}")
 downloadResult(result["resultDocumentId"], "../../output/extract_images.zip", CLIENT_ID, CLIENT_SECRET)
 print("Done and saved to: ../../output/extract_images.zip")
 
-task = extractPDF(doc["documentId"], "PAGE", CLIENT_ID, CLIENT_SECRET, 2)
+task = extractPDF(doc["documentId"], "PAGE", CLIENT_ID, CLIENT_SECRET, "2,4,6")
 print(f"Created task, id is {task['taskId']}")
 result = checkTask(task["taskId"], CLIENT_ID, CLIENT_SECRET)
 print(f"Final result: {result}")
