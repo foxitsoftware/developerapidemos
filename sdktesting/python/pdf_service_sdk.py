@@ -174,3 +174,49 @@ class PDFServiceSDK:
         task_id = r.json()["taskId"]
         result_doc_id = self._check_task(task_id)
         self._download_result(result_doc_id, output_path)
+
+    def conversion(self, input_path, output_path):
+        """
+        Converts between supported formats using input and output file extensions.
+        :param input_path: Path to the input file.
+        :param output_path: Path to the output file.
+        """
+        def get_ext(path):
+            return path.split('.')[-1].lower()
+        input_ext = get_ext(input_path)
+        output_ext = get_ext(output_path)
+
+        # To PDF
+        if output_ext == 'pdf':
+            if input_ext in ("doc", "docx"):
+                return self.word_to_pdf(input_path, output_path)
+            elif input_ext in ("xls", "xlsx"):
+                return self.excel_to_pdf(input_path, output_path)
+            elif input_ext in ("ppt", "pptx"):
+                return self.powerpoint_to_pdf(input_path, output_path)
+            elif input_ext in ("html", "htm"):
+                return self.html_to_pdf(input_path, output_path)
+            elif input_ext == "txt":
+                return self.text_to_pdf(input_path, output_path)
+            elif input_ext in ("png", "jpg", "jpeg", "bmp", "gif"):
+                return self.image_to_pdf(input_path, output_path)
+            else:
+                raise Exception(f"Conversion from .{input_ext} to .pdf is not supported.")
+        # From PDF
+        elif input_ext == 'pdf':
+            if output_ext in ("doc", "docx"):
+                return self.pdf_to_word(input_path, output_path)
+            elif output_ext in ("xls", "xlsx"):
+                return self.pdf_to_excel(input_path, output_path)
+            elif output_ext in ("ppt", "pptx"):
+                return self.pdf_to_powerpoint(input_path, output_path)
+            elif output_ext in ("html", "htm"):
+                return self.pdf_to_html(input_path, output_path)
+            elif output_ext == "txt":
+                return self.pdf_to_text(input_path, output_path)
+            elif output_ext in ("png", "jpg", "jpeg", "bmp", "gif"):
+                return self.pdf_to_image(input_path, output_path)
+            else:
+                raise Exception(f"Conversion from .pdf to .{output_ext} is not supported.")
+        else:
+            raise Exception(f"Conversion from .pdf to .{output_ext} is not supported.")

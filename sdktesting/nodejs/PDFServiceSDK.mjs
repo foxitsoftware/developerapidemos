@@ -5,7 +5,7 @@
 import { readFile, writeFile } from 'fs/promises';
 
 export class PDFServiceSDK {
-    constructor(clientId, clientSecret, host) {
+    constructor(clientId, clientSecret, host="https://na1.fusion.foxit.com") {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.host = host;
@@ -239,5 +239,55 @@ export class PDFServiceSDK {
         const { taskId } = await res.json();
         const resultDocId = await this._checkTask(taskId);
         await this._downloadResult(resultDocId, outputPath);
+    }
+
+    /**
+     * Converts between supported formats using input and output file extensions.
+     * @param {string} inputPath - Path to the input file.
+     * @param {string} outputPath - Path to the output file.
+     */
+    async conversion(inputPath, outputPath) {
+        const getExt = path => path.split('.').pop().toLowerCase();
+        const inputExt = getExt(inputPath);
+        const outputExt = getExt(outputPath);
+
+        // To PDF
+        if (outputExt === 'pdf') {
+            if (["doc", "docx"].includes(inputExt)) {
+                return this.wordToPDF(inputPath, outputPath);
+            } else if (["xls", "xlsx"].includes(inputExt)) {
+                return this.excelToPDF(inputPath, outputPath);
+            } else if (["ppt", "pptx"].includes(inputExt)) {
+                return this.powerpointToPDF(inputPath, outputPath);
+            } else if (["html", "htm"].includes(inputExt)) {
+                return this.htmlToPDF(inputPath, outputPath);
+            } else if (["txt"].includes(inputExt)) {
+                return this.textToPDF(inputPath, outputPath);
+            } else if (["png", "jpg", "jpeg", "bmp", "gif"].includes(inputExt)) {
+                return this.imageToPDF(inputPath, outputPath);
+            } else {
+                throw new Error(`Conversion from .${inputExt} to .pdf is not supported.`);
+            }
+        }
+        // From PDF
+        else if (inputExt === 'pdf') {
+            if (["doc", "docx"].includes(outputExt)) {
+                return this.pdfToWord(inputPath, outputPath);
+            } else if (["xls", "xlsx"].includes(outputExt)) {
+                return this.pdfToExcel(inputPath, outputPath);
+            } else if (["ppt", "pptx"].includes(outputExt)) {
+                return this.pdfToPowerPoint(inputPath, outputPath);
+            } else if (["html", "htm"].includes(outputExt)) {
+                return this.pdfToHTML(inputPath, outputPath);
+            } else if (["txt"].includes(outputExt)) {
+                return this.pdfToText(inputPath, outputPath);
+            } else if (["png", "jpg", "jpeg", "bmp", "gif"].includes(outputExt)) {
+                return this.pdfToImage(inputPath, outputPath);
+            } else {
+                throw new Error(`Conversion from .pdf to .${outputExt} is not supported.`);
+            }
+        } else {
+            throw new Error(`Conversion from .pdf to .${outputExt} is not supported.`);
+        }
     }
 }
