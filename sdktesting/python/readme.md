@@ -36,9 +36,12 @@ print("Conversion (second version) completed successfully. Check the output file
 * extract(input_path, output_path, type (one of TEXT, IMAGE, PAGE), page_range) - extracts either text, images (zip), or pages (new pdf)
 * download(doc_id, output_path) - given a document id and path, will stream the data down
 * upload(path) - upload a document and return a path
+* compress(input_path,output_path,compressionLevel) - compresses a PDF, default level is LOW
+* linearize(input_path,output_path) - linearizes a PDF
+* flatten(input_path,output_path) - flattens a PDF
 
 ## To Do: 
 
-* remove-password, protect, linearize, combine, compress, flatten, manipulate, split, compare
+* remove-password, protect, combine, manipulate, split, compare
 * Make output path optional and just return the doc id
 * Make checking a task public and a utility pollTask to handle repeating (this and the previous two methods would let devs chain calls)

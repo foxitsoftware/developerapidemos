@@ -41,6 +41,15 @@ class PDFServiceSDK:
         with open(output_path, "wb") as f:
             f.write(r.content)
 
+    def compress(self, input_path, output_path, level="LOW"):
+        doc_id = self.upload(input_path)
+        body = {"documentId": doc_id, "compressionLevel":level}
+        r = requests.post(f"{self.host}/pdf-services/api/documents/modify/pdf-compress", json=body, headers=self._headers("application/json"))
+        r.raise_for_status()
+        task_id = r.json()["taskId"]
+        result_doc_id = self._check_task(task_id)
+        self.download(result_doc_id, output_path)
+
     def excel_to_pdf(self, input_path, output_path):
         doc_id = self.upload(input_path)
         body = {"documentId": doc_id}
@@ -66,6 +75,15 @@ class PDFServiceSDK:
         result_doc_id = self._check_task(task_id)
         self.download(result_doc_id, output_path)
 
+    def flatten(self, input_path, output_path):
+        doc_id = self.upload(input_path)
+        body = {"documentId": doc_id}
+        r = requests.post(f"{self.host}/pdf-services/api/documents/modify/pdf-flatten", json=body, headers=self._headers("application/json"))
+        r.raise_for_status()
+        task_id = r.json()["taskId"]
+        result_doc_id = self._check_task(task_id)
+        self.download(result_doc_id, output_path)
+
     def html_to_pdf(self, input_path, output_path):
         doc_id = self.upload(input_path)
         body = {"documentId": doc_id}
@@ -79,6 +97,15 @@ class PDFServiceSDK:
         doc_id = self.upload(input_path)
         body = {"documentId": doc_id}
         r = requests.post(f"{self.host}/pdf-services/api/documents/create/pdf-from-image", json=body, headers=self._headers("application/json"))
+        r.raise_for_status()
+        task_id = r.json()["taskId"]
+        result_doc_id = self._check_task(task_id)
+        self.download(result_doc_id, output_path)
+
+    def linearize(self, input_path, output_path):
+        doc_id = self.upload(input_path)
+        body = {"documentId": doc_id}
+        r = requests.post(f"{self.host}/pdf-services/api/documents/optimize/pdf-linearize", json=body, headers=self._headers("application/json"))
         r.raise_for_status()
         task_id = r.json()["taskId"]
         result_doc_id = self._check_task(task_id)
