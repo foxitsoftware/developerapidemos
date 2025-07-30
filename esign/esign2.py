@@ -35,6 +35,7 @@ def sendReminder(envelope_id, token):
 	result = response.json()
 	return result
 
+# Be sure to pass the envelope id as the argument!
 envelope_id = int(sys.argv[1])
 access_token = getAccessToken(CLIENT_ID, CLIENT_SECRET)
 result = sendReminder(envelope_id, access_token)

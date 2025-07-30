@@ -3,3 +3,4 @@ temp
 output/*
 !output/.gitkeep
 .vscode
+__pycache__
